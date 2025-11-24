@@ -29,4 +29,24 @@ public class ProductServiceImpl implements ProductService {
                 .map(productMapper::toResponseDto)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public ProductResponseDto findProductById(Long id){
+        Product product = productRepository.findByEstSupprimeFalse(id)
+                .orElseThrow(()->new ResourceNotFoundException("Produit non trouvé ou supprimé avec ID: " + id));
+        return productMapper.toResponseDto(product);
+    }
+
+    @Override
+    public ProductResponseDto updateProduct(Long id, ProductRequestDto productDto) {
+        Product product = productRepository.findByIdAndEstSupprimeFalse(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé ou supprimé avec ID: " + id));
+
+        // Utilise MapStruct pour mettre à jour les champs
+        productMapper.updateEntityFromDto(productDto, product);
+        product = productRepository.save(product);
+        return productMapper.toResponseDto(product);
+    }
+
+
 }
