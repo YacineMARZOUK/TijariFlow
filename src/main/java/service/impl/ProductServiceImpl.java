@@ -48,5 +48,14 @@ public class ProductServiceImpl implements ProductService {
         return productMapper.toResponseDto(product);
     }
 
+    @Override
+    public void softDeleteProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé avec ID: " + id));
+
+        product.setEstSupprime(true);
+        productRepository.save(product);
+    }
+
 
 }
