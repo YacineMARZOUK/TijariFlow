@@ -7,6 +7,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Client {
 
     @Id
