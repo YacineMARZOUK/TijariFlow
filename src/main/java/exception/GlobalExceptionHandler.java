@@ -64,4 +64,34 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, status);
 
     }
+
+    // --- 401 & 403 (À implémenter dans le filtre d'authentification) ---
+    // Ces exceptions seront gérées soit par un filtre ou en les mappant ici.
+    // Par exemple:
+    /*
+    @ExceptionHandler(UnauthenticatedException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthenticated(UnauthenticatedException ex, HttpServletRequest request) {
+        // ... Logique pour 401 Unauthorized
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleForbidden(ForbiddenException ex, HttpServletRequest request) {
+        // ... Logique pour 403 Forbidden
+    }
+    */
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        String message = "Une erreur interne s'est produite. Veuillez réessayer plus tard.";
+
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(status.value())
+                .errorType("Internal Server Error")
+                .message(message)
+                .path(request.getRequestURI())
+                .build();
+        return new ResponseEntity<>(error, status);
+    }
 }
