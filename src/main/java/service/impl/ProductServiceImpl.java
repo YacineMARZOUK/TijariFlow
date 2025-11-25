@@ -3,13 +3,18 @@ package service.impl;
 import dto.ProductRequestDto;
 import dto.ProductResponseDto;
 import entity.Product;
+import lombok.RequiredArgsConstructor;
 import mapper.ProductMapper;
+import org.springframework.stereotype.Service;
 import repository.ProductRepository;
 import service.ProductService;
+import exception.ResourceNotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
     private final ProductMapper productMapper;
@@ -31,9 +36,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponseDto findProductById(Long id){
-        Product product = productRepository.findByEstSupprimeFalse(id)
-                .orElseThrow(()->new ResourceNotFoundException("Produit non trouvé ou supprimé avec ID: " + id));
+    public ProductResponseDto findProductById(Long id) {
+        Product product = productRepository.findByIdAndEstSupprimeFalse(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé ou supprimé avec ID: " + id));
         return productMapper.toResponseDto(product);
     }
 
