@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
-import java.util.logging.Filter;
+import jakarta.servlet.Filter;
 
 public class AuthenticationFilter implements Filter {
     @Override
