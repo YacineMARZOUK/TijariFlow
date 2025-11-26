@@ -1,6 +1,7 @@
 package config;
 
 import controller.AuthController;
+import enums.UserRole;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -32,6 +33,14 @@ public class AuthenticationFilter implements Filter {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType("application/json");
             response.getWriter().write("{\\\"status\\\": 401, \\\"errorType\\\": \\\"Unauthorized\\\", \\\"message\\\": \\\"Authentification requise.\\\"}\"");
+            return;
+        }
+
+        UserRole userRole = (UserRole) session.getAttribute("USER_ROLE");
+        if (path.startsWith("/api/admin/") && userRole != UserRole.ADMIN) {
+            response.setStatus(HttpStatus.FORBIDDEN.value()); // 403
+            response.setContentType("application/json");
+            response.getWriter().write("{\"status\": 403, \"errorType\": \"Forbidden\", \"message\": \"Accès refusé. Rôle ADMIN requis.\"}");
             return;
         }
     }
