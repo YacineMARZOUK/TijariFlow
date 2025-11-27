@@ -10,5 +10,6 @@ public class ProductResponseDto {
     private String nom;
     private BigDecimal prixUnitaireHT;
     private Integer stockDisponible;
+    private boolean estSupprime
 
 }
