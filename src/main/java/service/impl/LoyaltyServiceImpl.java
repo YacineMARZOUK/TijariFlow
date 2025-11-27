@@ -18,7 +18,7 @@ public class LoyaltyServiceImpl implements LoyaltyService {
 
     private final ClientRepository clientRepository;
 
-    // Constantes de taux de remise (utilisées par getLoyaltyDiscountRate)
+    // taux de remise
     private static final Map<CustomerTier, BigDecimal> TIER_DISCOUNT_RATES = Map.of(
             CustomerTier.PLATINUM, new BigDecimal("0.15"),
             CustomerTier.GOLD, new BigDecimal("0.10"),
@@ -78,4 +78,3 @@ public class LoyaltyServiceImpl implements LoyaltyService {
 }
 
 
-}
