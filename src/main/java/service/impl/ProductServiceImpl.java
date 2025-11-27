@@ -58,6 +58,10 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé avec ID: " + id));
 
+        if (product.isEstSupprime()) {
+            return;
+        }
+
         product.setEstSupprime(true);
         productRepository.save(product);
     }
