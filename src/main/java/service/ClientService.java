@@ -9,5 +9,5 @@ public interface ClientService {
     ClientResponseDto createClient(ClientCreationRequestDto clientDto);
     List<ClientResponseDto> findAllClients();
     ClientResponseDto findClientById(Long id); // Utilisé par l'ADMIN
-    ClientResponseDto findClientProfile(Long userId);
+    ClientResponseDto findClientProfile();
 }
