@@ -18,6 +18,8 @@ import repository.UserRepository;
 import service.ClientService;
 
 import java.util.List;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class ClientServiceImpl implements ClientService {
@@ -93,6 +95,51 @@ public class ClientServiceImpl implements ClientService {
 
 
         return clientMapper.toResponseDto(user.getClient());
+    }
+    @Override
+    @Transactional
+    public ClientResponseDto updateClient(Long id, ClientCreationRequestDto clientDto) {
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Client non trouvé avec ID: " + id));
+
+        // 1. Mise à jour des champs Client
+        client.setNom(clientDto.getNom());
+        client.setEmail(clientDto.getEmail());
+        client.setTelephone(clientDto.getTelephone());
+        client.setAdresse(clientDto.getAdresse());
+
+
+        if (client.getUser() != null) {
+
+
+            if (!client.getUser().getUsername().equals(clientDto.getUsername())) {
+                Optional<User> existingUser = userRepository.findByUsername(clientDto.getUsername());
+                if (existingUser.isPresent() && !existingUser.get().getId().equals(client.getUser().getId())) {
+                    throw new BusinessRuleViolationException("Le nouveau nom d'utilisateur est déjà pris.");
+                }
+                client.getUser().setUsername(clientDto.getUsername());
+            }
+
+            userRepository.save(client.getUser());
+        }
+
+        Client updatedClient = clientRepository.save(client);
+        return clientMapper.toResponseDto(updatedClient);
+    }
+
+    @Override
+    @Transactional
+    public void deleteClient(Long id) {
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Client non trouvé avec ID: " + id));
+
+        Long userId = client.getUser() != null ? client.getUser().getId() : null;
+
+        clientRepository.delete(client);
+
+        if (userId != null) {
+            userRepository.deleteById(userId);
+        }
     }
 
 

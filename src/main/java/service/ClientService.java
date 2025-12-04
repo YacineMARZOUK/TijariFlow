@@ -10,4 +10,6 @@ public interface ClientService {
     List<ClientResponseDto> findAllClients();
     ClientResponseDto findClientById(Long id); // Utilisé par l'ADMIN
     ClientResponseDto findClientProfile();
+    ClientResponseDto updateClient(Long id, ClientCreationRequestDto clientDto);
+    void deleteClient(Long id);
 }
