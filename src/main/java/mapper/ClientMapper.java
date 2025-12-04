@@ -19,9 +19,6 @@ public interface ClientMapper {
 
     List<ClientResponseDto> toResponseDto(List<Client> clients);
 
-    //  la Création
-
-    //  Client
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", ignore = true) // L'utilisateur est créé séparément
     @Mapping(target = "nombreTotalCommandes", ignore = true)
@@ -31,7 +28,6 @@ public interface ClientMapper {
     @Mapping(target = "niveauFidelite", ignore = true)
     Client toEntity(ClientCreationRequestDto dto);
 
-    //  User
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "role", constant = "CLIENT")
     @Mapping(source = "username", target = "username")
