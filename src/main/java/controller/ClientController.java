@@ -44,4 +44,17 @@ public class ClientController {
         ClientResponseDto profile = clientService.findClientProfile();
         return ResponseEntity.ok(profile);
     }
+
+    @PutMapping("/admin/clients/{id}")
+    public ResponseEntity<ClientResponseDto> updateClient(@PathVariable Long id,
+                                                          @Valid @RequestBody ClientCreationRequestDto clientDto) {
+        ClientResponseDto updatedClient = clientService.updateClient(id, clientDto);
+        return ResponseEntity.ok(updatedClient);
+    }
+
+    @DeleteMapping("/admin/clients/{id}")
+    public ResponseEntity<Void> deleteClient(@PathVariable Long id) {
+        clientService.deleteClient(id);
+        return ResponseEntity.noContent().build();
+    }
 }
