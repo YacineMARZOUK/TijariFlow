@@ -27,11 +27,11 @@ public class LigneCommande {
     @Column(nullable = false)
     private Integer quantite;
 
-    // Prix fixé au moment de la commande (pour la traçabilité)
+
     @Column(precision = 10, scale = 2)
     private BigDecimal prixUnitaireAuMomentDeLaCommande;
 
-    // Total Ligne HT (prix * quantité)
+
     @Column(precision = 10, scale = 2)
     private BigDecimal totalLigneHT;
 }
