@@ -2,6 +2,9 @@ package service;
 
 import dto.CommandeCreationRequestDto;
 import dto.CommandeResponseDto;
+import dto.PaiementRequestDto;
+import enums.OrderStatus;
+
 import java.util.List;
 
 public interface CommandeService {
@@ -11,7 +14,8 @@ public interface CommandeService {
     CommandeResponseDto getCommandeById(Long id);
     List<CommandeResponseDto> getCommandesByClientId(Long clientId);
 
-    // Méthodes de gestion de cycle de vie
-    // CommandeResponseDto updateCommandeStatus(Long id, OrderStatus newStatus);
-    // CommandeResponseDto processPayment(Long id, BigDecimal amount);
+    CommandeResponseDto updateCommandeStatus(Long id, OrderStatus newStatus);
+
+
+    CommandeResponseDto processPayment(Long id, PaiementRequestDto paiementDto);
 }
