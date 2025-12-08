@@ -3,6 +3,7 @@ package service.impl;
 import dto.*;
 import entity.*;
 import enums.OrderStatus;
+import enums.PaymentStatus;
 import exception.BusinessRuleViolationException;
 import exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ public class CommandeServiceImpl implements CommandeService {
     private final CommandeMapper commandeMapper;
 
     private static final BigDecimal TVA_RATE = new BigDecimal("0.20"); // 20%
+    private static final BigDecimal LIMITE_ESPECES = new BigDecimal("20000.00");
 
     @Override
     @Transactional
@@ -124,41 +126,49 @@ public class CommandeServiceImpl implements CommandeService {
         Commande commande = commandeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Commande non trouvée avec ID: " + id));
 
-        BigDecimal montantPaiement = paiementDto.getAmount();
-
-        if (montantPaiement.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessRuleViolationException("Le montant du paiement doit être positif.");
-        }
-
+        BigDecimal montantPaiement = paiementDto.getMontant();
         BigDecimal montantRestant = commande.getMontantRestant();
+        String typePaiement = paiementDto.getTypePaiement().toUpperCase();
 
         if (montantRestant.compareTo(BigDecimal.ZERO) <= 0) {
             throw new BusinessRuleViolationException("Cette commande est déjà entièrement payée.");
         }
 
+        // 1. Validation de la Règle des 20 000 DH pour ESPÈCES
+        if ("ESPÈCES".equals(typePaiement) && montantPaiement.compareTo(LIMITE_ESPECES) > 0) {
+            throw new BusinessRuleViolationException("La limite légale de paiement en espèces est de 20,000 DH.");
+        }
 
+
+        PaymentStatus statutInitial;
+        if ("ESPÈCES".equals(typePaiement)) {
+            statutInitial = PaymentStatus.ENCAISSÉ;
+        } else {
+            statutInitial = PaymentStatus.EN_ATTENTE;
+        }
+
+        //entité Paiement
         Paiement paiement = Paiement.builder()
                 .commande(commande)
+                .numeroSequentiel(commande.getPaiements().size() + 1)
                 .datePaiement(LocalDate.now())
                 .montant(montantPaiement)
+                .typePaiement(typePaiement)
+                .reference(paiementDto.getReference())
+                .statut(statutInitial)
+                .banque(paiementDto.getBanque())
+                .dateEcheance(paiementDto.getDateEcheance())
+                .dateEncaissement("ESPÈCES".equals(typePaiement) ? LocalDate.now() : null)
                 .build();
 
         paiementRepository.save(paiement);
 
-        //Misejour Commande
+
         BigDecimal nouveauMontantRestant = montantRestant.subtract(montantPaiement);
 
-        if (nouveauMontantRestant.compareTo(BigDecimal.ZERO) < 0) {
-            commande.setMontantRestant(BigDecimal.ZERO);
-            commande.setStatut(OrderStatus.CONFIRMED);
+        commande.setMontantRestant(nouveauMontantRestant.compareTo(BigDecimal.ZERO) < 0
+                ? BigDecimal.ZERO : nouveauMontantRestant.setScale(2, RoundingMode.HALF_UP));
 
-        } else if (nouveauMontantRestant.compareTo(BigDecimal.ZERO) == 0) {
-            commande.setMontantRestant(BigDecimal.ZERO);
-            commande.setStatut(OrderStatus.CONFIRMED);
-
-        } else {
-            commande.setMontantRestant(nouveauMontantRestant.setScale(2, RoundingMode.HALF_UP));
-        }
 
         if (commande.getPaiements() == null) {
             commande.setPaiements(new ArrayList<>());
@@ -166,7 +176,29 @@ public class CommandeServiceImpl implements CommandeService {
         commande.getPaiements().add(paiement);
 
         commande = commandeRepository.save(commande);
-
         return commandeMapper.toResponseDto(commande);
     }
-}
+
+    @Override
+    @Transactional
+    public PaiementResponseDto updatePaymentStatus(Long paiementId, PaymentStatus newStatus) {
+        Paiement paiement = paiementRepository.findById(paiementId)
+                .orElseThrow(() -> new ResourceNotFoundException("Paiement non trouvé avec ID: " + paiementId));
+
+        if (newStatus == PaymentStatus.ENCAISSÉ && paiement.getDateEncaissement() == null) {
+            paiement.setDateEncaissement(LocalDate.now());
+        }
+
+        if (newStatus == PaymentStatus.REJETÉ && paiement.getStatut() != PaymentStatus.REJETÉ) {
+            Commande commande = paiement.getCommande();
+            BigDecimal montantRéintégré = commande.getMontantRestant().add(paiement.getMontant());
+            commande.setMontantRestant(montantRéintégré.setScale(2, RoundingMode.HALF_UP));
+            commandeRepository.save(commande);
+        }
+
+        paiement.setStatut(newStatus);
+        paiementRepository.save(paiement);
+
+
+        return new PaiementResponseDto(); // Placeholder
+    }
