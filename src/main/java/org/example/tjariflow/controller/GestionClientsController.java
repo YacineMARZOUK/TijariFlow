@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.tjariflow.dto.request.ClientRequestDTO;
+import org.example.tjariflow.dto.response.basic.ClientOrderStatsResponseBasicDTO;
 import org.example.tjariflow.dto.response.basic.ClientResponseBasicDTO;
 import org.example.tjariflow.dto.response.detail.ClientResponseDetailDTO;
 import org.example.tjariflow.service.ClientService;
@@ -57,5 +58,9 @@ public class GestionClientsController {
         clientService.deleteClient(id);
         return ResponseEntity.ok().body("Client deleted successfully");
     }
-
+    @GetMapping("/stats")
+    public ClientOrderStatsResponseBasicDTO getClientOrderStats(HttpSession session) {
+        String id = (String) session.getAttribute("USER_ID");
+        return clientService.getClientOrderStats(id);
+    }
 }

@@ -1,6 +1,7 @@
 package org.example.tjariflow.service;
 import org.example.tjariflow.dto.request.ClientRequestDTO;
 
+import org.example.tjariflow.dto.response.basic.ClientOrderStatsResponseBasicDTO;
 import org.example.tjariflow.dto.response.basic.ClientResponseBasicDTO;
 import org.example.tjariflow.dto.response.detail.ClientResponseDetailDTO;
 import org.springframework.data.domain.Page;
@@ -12,4 +13,5 @@ public interface ClientService {
     ClientResponseBasicDTO getClientBasicByid(String id);
     ClientResponseDetailDTO updateClient(String id, ClientRequestDTO clientRequestDTO);
     void deleteClient(String id);
+    public ClientOrderStatsResponseBasicDTO getClientOrderStats(String clientId);
 }
