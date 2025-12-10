@@ -1,7 +1,7 @@
 package org.example.tjariflow.utils;
 import org.example.tjariflow.model.entity.Admin;
 import org.example.tjariflow.model.enums.Roles;
-import org.example.tjariflow.Repository.AdminRepository;
+import org.example.tjariflow.repository.AdminRepository;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
