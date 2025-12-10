@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @ControllerAdvice
@@ -71,6 +73,16 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+    @ExceptionHandler(ConflictStateException.class)
+    public ResponseEntity<?> handleConflictStateException(
+            ConflictStateException ex, HttpServletRequest request) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("status", String.valueOf( HttpStatus.CONFLICT.value()));
+        errors.put("error", "CONFLICT");
+        errors.put("message", ex.getMessage());
+        errors.put("path", request.getRequestURI());
+        return new ResponseEntity<>(errors,HttpStatus.CONFLICT);
     }
 
 }
