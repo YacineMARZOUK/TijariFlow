@@ -4,9 +4,10 @@ package org.example.tjariflow.config;
 import org.example.tjariflow.dto.response.ErrorResponseDTO;
 import org.example.tjariflow.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.tomcat.websocket.AuthenticationException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.slf4j.Logger;
@@ -83,6 +84,42 @@ public class GlobalExceptionHandler {
         errors.put("message", ex.getMessage());
         errors.put("path", request.getRequestURI());
         return new ResponseEntity<>(errors,HttpStatus.CONFLICT);
+    }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleValidationExceptions(
+            MethodArgumentNotValidException ex, HttpServletRequest request) {
+
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage())
+        );
+        errors.put("status", String.valueOf( HttpStatus.BAD_REQUEST.value()));
+        errors.put("error", errors.toString());
+        errors.put("message", ex.getMessage());
+        errors.put("path", request.getRequestURI());
+
+        return new ResponseEntity<>(errors,HttpStatus.BAD_REQUEST);
+
+    }
+    // 400 – Erreur métier / validation
+    @ExceptionHandler({BusinessException.class, ValidationException.class})
+    public ResponseEntity<ErrorResponseDTO> handleBusiness(RuntimeException ex, HttpServletRequest request) {
+        ErrorResponseDTO error = ErrorResponseDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException ex) {
+        logger.error("Unexpected error occurred: {}", ex.getMessage(), ex);
+        Map<String, String> response = new HashMap<>();
+        response.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
 }

@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
+
 @Entity
 @Data
 @Table(name = "clients")
@@ -22,4 +24,6 @@ public class Client extends User {
     @Column(name = "customer_tier")
     @Builder.Default
     private CustomerTierStatus customerTier = CustomerTierStatus.BASIC;
+    @OneToMany(mappedBy = "client" , cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Order> orders;
 }
