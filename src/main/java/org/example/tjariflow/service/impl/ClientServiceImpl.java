@@ -1,4 +1,4 @@
-package org.example.tjariflow.service.Impl;
+package org.example.tjariflow.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package org.example.tjariflow.service.Impl;
+package org.example.tjariflow.service.impl;
 import org.example.tjariflow.dto.request.LoginRequestDTO;
 import org.example.tjariflow.exception.InvalidCredentialsException;
 import org.example.tjariflow.exception.ResourceNotFoundException;
