@@ -53,11 +53,14 @@ public class PaymentServiceImpl implements PaymentService {
         if (order.getRemainingAmount().compareTo(BigDecimal.ZERO) > 0) {
             return;
         }
+        // get products and update stock
         order.getOrderItems().forEach(item -> {
             Product p = item.getProduct();
             p.setQuantity(p.getQuantity() - item.getQuantity());
             productRepository.save(p);
         });
+
+        //get confirmed orders
         Client client = order.getClient();
         long totalOrders = client.getOrders().stream()
                 .filter(o -> o.getStatus() == OrderStatus.CONFIRMED)

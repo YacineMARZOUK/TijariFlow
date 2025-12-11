@@ -34,9 +34,9 @@ public class AuthController {
         res.setUseName( auth.getUserName());
         res.setRole(auth.getRole());
         if ("ADMIN".equals(auth.getRole())) {
-            res.setMessage("Admin authentifié avec succès !");
+            res.setMessage( auth.getRole() + " authentifié avec succès !");
         } else {
-            res.setMessage("Client authentifié avec succès !");
+            res.setMessage( auth.getRole() + " authentifié avec succès !");
         }
         return ResponseEntity.ok(res);
     }

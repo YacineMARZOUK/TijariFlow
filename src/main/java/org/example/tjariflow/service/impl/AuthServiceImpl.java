@@ -22,7 +22,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new ResourceNotFoundException("userName not found"));
         boolean passwordMatches = BCrypt.checkpw(loginRequestDTO.getPassword(),user.getPassword());
         if(!passwordMatches){
-            throw new InvalidCredentialsException("Invalid username or password");
+            throw new InvalidCredentialsException("Invalid  password");
         }
         return user;
     }

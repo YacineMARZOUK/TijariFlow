@@ -68,7 +68,6 @@ public class ProductServiceImplTest {
         Pageable pageable = PageRequest.of(0, 10);
         Product product = new Product();
         ProductResponseDetailDTO dto = new ProductResponseDetailDTO();
-
         Page<Product> productPage = new PageImpl<>(List.of(product));
 
         when(productRepository.findAll(pageable)).thenReturn(productPage);
